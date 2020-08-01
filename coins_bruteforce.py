@@ -1,7 +1,5 @@
 
 import hashlib
-import itertools
-import pandas as pd
 import random
 from pwn import *
 
@@ -21,26 +19,27 @@ class coinMaster:
                         XXXX = space[i_1]+space[i_2]+space[i_3]+space[i_4]
                         i+=1
                         if(i%1000000==0):
-                            print('rodrigo la chupa ',i)
+                            print('# tries',i)
                         bruteforcing = XXXX + str(coin_suffix)
                         bruteforcing = bruteforcing.encode()
                         intento = hashlib.sha256(bruteforcing).hexdigest()
                         if (intento == encrypted):
                             print('cracked!')
-                            return intento
+                            return intento[0:4]
 
 
     def interaction(self):
         line=self.conn.recvline()
-        print(line)
         encrypted=line.split()[2].decode()
         sufix=line.split()[0].decode().split('+')[1].split(')')[0]
         key=self.find_key(sufix,encrypted)
-        self.conn.sendline(key[0:4])
-        print(key[0:4])
-        for i in range(10):
-            lines=self.conn.recvline()
-            print(lines)
+        print(key)
+        self.conn.sendline(key)
+        try:
+            print(self.conn.recvline())
+        except:
+            self.conn.sendline(key)
+        print('xxxxxxxx')
 
 
 
