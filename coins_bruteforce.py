@@ -41,6 +41,14 @@ class coinMaster:
         print(line.split()[-1])
         sol=self.binary_console(line.split()[-1])
         self.conn.sendline(f'! {sol}')
+        print(self.conn.recvline())
+
+        line = self.conn.recvline()
+        print(line.split()[-1])
+        sol = self.binary_console(line.split()[-1])
+        self.conn.sendline(f'! {sol}')
+
+        print(self.conn.recvline())
         line = self.conn.recvline()
         print(line.split()[-1])
         sol = self.binary_console(line.split()[-1])
@@ -58,59 +66,76 @@ class coinMaster:
         lower = 0
         upper = int(size.decode()) - 1
         solution=-1
+        self.conn.sendline(f'{lower} {lower}')
+        line0 = self.conn.recvline()
+        print(line0)
+        ref_weigth = int(line0.split()[-1].decode())
+        print(f'[{lower}, {lower}]->  same ref {ref_weigth}')
+
+
         while (True):
+            #print(f'[{lower - 2}, {lower}]-> {num_3}')
             mid = (upper + lower) // 2
-            pad_low = (mid - lower + 1) % 2
-            pad_high = (upper - mid + 1) % 2
+            pad_low = 0#(mid - lower + 1) % 2
+            pad_high = 0#(upper - mid + 1) % 2
             if (upper - lower == 2):
                 print('difference is 2 so...')
-                self.conn.sendline(f'{lower} {lower+1}')
+                self.conn.sendline(f'{lower} {lower}')
                 line3 = self.conn.recvline()
                 print(line3)
                 sleep(1)
-                num_3 = int(line1.split()[-1].decode())
-                print(f'[{lower}, {lower+1}]-> {num_3}')
+                num_3 = int(line3.split()[-1].decode())
+                print(f'[{lower}, {lower}]-> {num_3}')
 
-                self.conn.sendline(f'{upper-1} {upper}')
+                self.conn.sendline(f'{upper} {upper}')
                 line4 = self.conn.recvline()
                 print(line4)
                 sleep(1)
-                num_4 = int(line1.split()[-1].decode())
-                print(f'[{upper-1}, {upper}]-> {num_4}')
+                num_4 = int(line4.split()[-1].decode())
+                print(f'[{upper}, {upper}]-> {num_4}')
 
-                if num_3 > num_4:
-                    solution =lower
-                    break
+                self.conn.sendline(f'{lower+1} {lower+1}')
+                line5 = self.conn.recvline()
+                print(line5)
+                sleep(1)
+                num_5 = int(line5.split()[-1].decode())
+                print(f'[{lower+1}, {lower+1}]-> {num_5}')
+
                 if num_3 == num_4:
-                    solution = lower+1
+                    solution = lower + 1
                     break
-                if num_3 < num_4:
+                if num_4 == num_5:
+                    solution = lower
+                    break
+                if num_3 == num_5:
                     solution = upper
                     break
             if (upper - lower == 1):
                 print('consecutive numbers ...')
-                self.conn.sendline(f'{lower-2} {lower}')
+                self.conn.sendline(f'{lower} {lower}')
                 line3 = self.conn.recvline()
                 print(line3)
                 num_3 = int(line1.split()[-1].decode())
-                print(f'[{lower-2}, {lower}]-> {num_3}')
+                print(f'[{lower}, {lower}]-> {num_3}')
 
-                self.conn.sendline(f'{upper} {upper+2}')
+                self.conn.sendline(f'{upper} {upper}')
                 line4 = self.conn.recvline()
                 print(line4)
                 num_4 = int(line1.split()[-1].decode())
-                print(f'[{upper}, {upper+2}]-> {num_4}')
+                print(f'[{upper}, {upper}]-> {num_4}')
 
-                if num_3 < num_4:
-                    print()
+                if num_3 == ref_weigth:
+                    print('yeah madafaka')
                     solution = upper
                     break
-                if num_4 > num_3:
+                if num_4 == ref_weigth:
+                    print('yeah madafaka')
                     solution= lower
                     break
                 if num_3 == num_4:
-                    solution =-1
+                    solution = lower
                     print('you f***ed it up man !')
+                    break
 
 
             print('still a long way to go...')
@@ -121,27 +146,19 @@ class coinMaster:
             num_1 = int(line1.split()[-1].decode())
             print(f'[{lower}, {mid+pad_low}]-> {num_1}')
 
-            self.conn.sendline(f'{mid-pad_high} {upper}')
-            line2 = self.conn.recvline()
-            print(line2)
-            sleep(1)
-            num_2 = int((line2.split()[-1]).decode())
-            print(f'[{mid-pad_high}, {upper}]-> {num_2}')
 
-            print(f'{num_1}->{lower},{mid + pad_low},<<{mid}>>,{mid - pad_high},{upper}<-{num_2}')
+
+            print(f'{num_1}->{lower},{mid + pad_low},<<{mid}>>,{mid - pad_high},{upper}<- ???? ')
             print('comparing cases...')
 
 
-            if (num_1 == 0):
+            if (num_1 == 0 or num_1==ref_weigth):
                 print('upper half')
-                lower = mid - pad_high
-            if (0 == num_2):
+                lower = mid+1 - pad_high
+            else:
                 print('lower half')
                 upper = mid + pad_low
-            if (num_1 == num_2):
-                print('damn bro... that escalated quickly!!!')
-                lower = mid - pad_high
-                upper = mid + pad_low
+
             if(lower==upper):
                 solution = lower
                 break
