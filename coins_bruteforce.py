@@ -1,8 +1,7 @@
 import hashlib
-import random
 from pwn import *
 from time import sleep
-import numpy as np
+
 class coinMaster:
     def __init__(self):
         self.conn = remote('34.74.30.191', 1337)
@@ -26,6 +25,7 @@ class coinMaster:
                             print('cracked!')
                             return bruteforcing.decode()
     def interaction(self):
+        # ====| log |==== #
         line = self.conn.recvline().decode("utf-8")
         sufix = line[12:28]
         encrypted = line[33:-1]
@@ -34,6 +34,9 @@ class coinMaster:
         print(key)
         print(self.conn.recvline())#'Give me XXXX:
         self.conn.sendline(key[0:4])
+        print('# ====| End Log |==== #')
+
+        # ====| small situation |==== #
         print(self.conn.recvline())#There exists a coin minting ...
         print(self.conn.recvline())# empty line
         line=self.conn.recvline()
@@ -41,28 +44,25 @@ class coinMaster:
         print(line.split()[-1])
         sol=self.binary_console(line.split()[-1])
         self.conn.sendline(f'! {sol}')
-        print(self.conn.recvline())
+        print('# ====| End Small Situation |==== #')
 
-        line = self.conn.recvline()
-        print(line.split()[-1])
-        sol = self.binary_console(line.split()[-1])
-        self.conn.sendline(f'! {sol}')
+        # ====| general situation |==== #
+        num=0
+        while (True):
+            print(self.conn.recvline())
+            line = self.conn.recvline()
+            print(line.split()[-1])
+            sol = self.binary_console(line.split()[-1])
+            self.conn.sendline(f'! {sol}')
+            print(f'# ====| End Rune {num}|==== #')
+            num += 1
+            if num==8:
+                print('challenge complete mfs')
+                self.conn.interactive()
 
-        print(self.conn.recvline())
-        line = self.conn.recvline()
-        print(line.split()[-1])
-        sol = self.binary_console(line.split()[-1])
-        self.conn.sendline(f'! {sol}')
-        print(self.conn.recvline())
-        print(self.conn.recvline())
-        print(self.conn.recvline())
-        print(self.conn.recvline())
-        print(self.conn.recvline())
-        print(self.conn.recvline())
-        print(self.conn.recvline())
 
     def binary_console(self,size):
-        print(self.conn.recvline())#Go ahead, ask some queries
+        print(self.conn.recvline())  # Go ahead, ask some queries
         lower = 0
         upper = int(size.decode()) - 1
         solution=-1
@@ -83,21 +83,21 @@ class coinMaster:
                 self.conn.sendline(f'{lower} {lower}')
                 line3 = self.conn.recvline()
                 print(line3)
-                sleep(1)
+
                 num_3 = int(line3.split()[-1].decode())
                 print(f'[{lower}, {lower}]-> {num_3}')
 
                 self.conn.sendline(f'{upper} {upper}')
                 line4 = self.conn.recvline()
                 print(line4)
-                sleep(1)
+
                 num_4 = int(line4.split()[-1].decode())
                 print(f'[{upper}, {upper}]-> {num_4}')
 
                 self.conn.sendline(f'{lower+1} {lower+1}')
                 line5 = self.conn.recvline()
                 print(line5)
-                sleep(1)
+
                 num_5 = int(line5.split()[-1].decode())
                 print(f'[{lower+1}, {lower+1}]-> {num_5}')
 
@@ -115,13 +115,13 @@ class coinMaster:
                 self.conn.sendline(f'{lower} {lower}')
                 line3 = self.conn.recvline()
                 print(line3)
-                num_3 = int(line1.split()[-1].decode())
+                num_3 = int(line3.split()[-1].decode())
                 print(f'[{lower}, {lower}]-> {num_3}')
 
                 self.conn.sendline(f'{upper} {upper}')
                 line4 = self.conn.recvline()
                 print(line4)
-                num_4 = int(line1.split()[-1].decode())
+                num_4 = int(line4.split()[-1].decode())
                 print(f'[{upper}, {upper}]-> {num_4}')
 
                 if num_3 == ref_weigth:
@@ -142,7 +142,7 @@ class coinMaster:
             self.conn.sendline(f'{lower} {mid+pad_low}')
             line1 = self.conn.recvline()
             print(line1)
-            sleep(1)
+
             num_1 = int(line1.split()[-1].decode())
             print(f'[{lower}, {mid+pad_low}]-> {num_1}')
 
