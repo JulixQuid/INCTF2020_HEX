@@ -32,20 +32,21 @@ class coinMaster:
         print(sufix, encrypted)
         key = self.find_key(sufix, encrypted)
         print(key)
-        print(self.conn.recvline())
+        print(self.conn.recvline())#'Give me XXXX:
         self.conn.sendline(key[0:4])
-        print(self.conn.recvline())
-        print(self.conn.recvline())
+        print(self.conn.recvline())#There exists a coin minting ...
+        print(self.conn.recvline())# empty line
         line=self.conn.recvline()
         print(line.split()[-1])
-        sol1=self.binary_console(line.split()[-1])
+        sol=self.binary_console(line.split()[-1])
         self.conn.sendline(str(sol1))
         line = self.conn.recvline()
         print(line.split()[-1])
-        sol1 = self.binary_console(line.split()[-1])
+        sol = self.binary_console(line.split()[-1])
         self.conn.sendline(str(sol1))
 
     def binary_console(self,size):
+        print(self.conn.recvline())#Go ahead, ask some queries
         lower = 0
         upper = int(size.decode()) - 1
         while (True):
@@ -66,8 +67,18 @@ class coinMaster:
             print(num_2)
             print(f'{num_1}->{lower},{mid + pad_low},<<{mid}>>,{mid - pad_high},{upper}<-{num_2}')
             if (upper - lower == 2):
-                num_3 = numbers[lower] ^ numbers[mid]
-                num_4 = numbers[mid] ^ numbers[upper]
+                self.conn.sendline(f'{lower} {mid+pad_low}')
+                line3 = self.conn.recvline()
+                print(line3)
+                num_3 = int(line1.split()[-1].decode())
+                print(num_3)
+
+                self.conn.sendline(f'{mid} {upper-pad_high}')
+                line4 = self.conn.recvline()
+                print(line4)
+                num_4 = int(line1.split()[-1].decode())
+                print(num_4)
+
                 if num_3 > num_4:
                     return lower
                 if num_3 == num_4:
@@ -75,8 +86,18 @@ class coinMaster:
                 if num_3 < num_4:
                     return upper
             if (upper - lower == 1):
-                num_3 = numbers[lower] ^ numbers[lower - 1]
-                num_4 = numbers[upper] ^ numbers[upper + 1]
+                self.conn.sendline(f'{lower-1} {lower}')
+                line3 = self.conn.recvline()
+                print(line3)
+                num_3 = int(line1.split()[-1].decode())
+                print(num_3)
+
+                self.conn.sendline(f'{upper} {upper+1}')
+                line4 = self.conn.recvline()
+                print(line4)
+                num_4 = int(line1.split()[-1].decode())
+                print(num_4)
+
                 if num_3 < num_4:
                     return upper
                 if num_4 > num_3:
@@ -89,7 +110,7 @@ class coinMaster:
                 upper = mid + pad_low
             if (num_1 == num_2):
                 lower = mid - pad_high
-                upper = mid - pad_low
+                upper = mid + pad_low
             print(f'{lower},{(lower + upper) // 2},{upper}')
 
     def binary_man(numbers):
