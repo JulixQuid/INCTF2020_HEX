@@ -39,11 +39,18 @@ class coinMaster:
         line=self.conn.recvline()
         print(line.split()[-1])
         sol=self.binary_console(line.split()[-1])
-        self.conn.sendline(str(sol1))
+        self.conn.sendline(f'!{sol}')
         line = self.conn.recvline()
         print(line.split()[-1])
         sol = self.binary_console(line.split()[-1])
-        self.conn.sendline(str(sol1))
+        self.conn.sendline(f'!{sol}')
+        print(self.conn.recvline())
+        print(self.conn.recvline())
+        print(self.conn.recvline())
+        print(self.conn.recvline())
+        print(self.conn.recvline())
+        print(self.conn.recvline())
+        print(self.conn.recvline())
 
     def binary_console(self,size):
         print(self.conn.recvline())#Go ahead, ask some queries
@@ -53,12 +60,14 @@ class coinMaster:
             mid = (upper + lower) // 2
             pad_low = (mid - lower) % 2
             self.conn.sendline(f'{lower} {mid}')
+            print(f'{lower} {mid}')
             line1 = self.conn.recvline()
             print(line1)
             sleep(1)
             num_1 = int(line1.split()[-1].decode())
             print(num_1)
             pad_high = (upper - mid) % 2
+            print(f'{lower} {mid}')
             self.conn.sendline(f'{lower} {mid}')
             line2 = self.conn.recvline()
             print(line2)
@@ -67,13 +76,15 @@ class coinMaster:
             print(num_2)
             print(f'{num_1}->{lower},{mid + pad_low},<<{mid}>>,{mid - pad_high},{upper}<-{num_2}')
             if (upper - lower == 2):
-                self.conn.sendline(f'{lower} {mid+pad_low}')
+                self.conn.sendline(f'{lower} {mid}')
+                print(f'{lower} {mid}')
                 line3 = self.conn.recvline()
                 print(line3)
                 num_3 = int(line1.split()[-1].decode())
                 print(num_3)
 
-                self.conn.sendline(f'{mid} {upper-pad_high}')
+                self.conn.sendline(f'{mid} {upper}')
+                print(f'{mid} {upper-pad_high}')
                 line4 = self.conn.recvline()
                 print(line4)
                 num_4 = int(line1.split()[-1].decode())
@@ -111,6 +122,8 @@ class coinMaster:
             if (num_1 == num_2):
                 lower = mid - pad_high
                 upper = mid + pad_low
+            if(lower==upper):
+                return lower
             print(f'{lower},{(lower + upper) // 2},{upper}')
 
     def binary_man(numbers):
